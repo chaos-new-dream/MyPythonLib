@@ -2,7 +2,7 @@
 import cv2
 import os
 import sys
-from PIL import Image
+from PIL import Image,ImageDraw,ImageFont
 
 def my_Videos2Images(video_path, save_path):
     """
@@ -55,7 +55,9 @@ def my_Videos2Images(video_path, save_path):
 
 def my_SimpleStitch(images, direction):
     """
-    
+    输入图片数组
+    输入'x'或者'y'
+    输出拼接好的图片
     """
     widths, heights = zip(*(i.size for i in images))
 
@@ -79,6 +81,9 @@ def my_SimpleStitch(images, direction):
     return new_image
 
 def my_GaussianBlur(srcPath, destPath, ksize,sigmaX,sigmaY):
+    """
+    将文件夹内所有的图片进行高斯模糊
+    """
     srcPath = os.path.abspath(srcPath)
     destPath = os.path.abspath(destPath)
     if not os.path.exists(srcPath):
@@ -115,3 +120,14 @@ def my_GaussianBlur(srcPath, destPath, ksize,sigmaX,sigmaY):
 
     print('\nOKK')
 
+def myExample_AddText(image,text,pos,colorRGB,ttfPath,fontSize=50):
+
+    draw = ImageDraw.Draw(image)
+    font = ImageFont.truetype(ttfPath, fontSize)
+    draw.text(pos, text, colorRGB, font=font,anchor='mm',
+            stroke_width=5,
+            stroke_fill=(0, 0, 0))
+    
+def myExample_AddRect(image,xyxy):
+    draw = ImageDraw.Draw(image)
+    draw.rectangle(xyxy, fill=(127,127,127),outline=(0,0,0),width=10)
