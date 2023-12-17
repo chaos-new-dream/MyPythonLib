@@ -53,7 +53,7 @@ def my_Videos2Images(video_path, save_path):
     print(f'一共{totalFrame}帧，保存至{save_path}')  # 表示一个视频片段已经转换完成
     return fps
 
-def my_SimpleStitch(images, direction):
+def my_SimpleStitch(images, direction, deltaLen=0):
     """
     输入图片数组
     输入'x'或者'y'
@@ -62,21 +62,23 @@ def my_SimpleStitch(images, direction):
     widths, heights = zip(*(i.size for i in images))
 
     if direction == 'x':
-        total_width = sum(widths)
+        total_width = sum(widths) + (len(images)-1)*deltaLen
         max_height = max(heights)
         new_image = Image.new('RGB', (total_width, max_height))
         x_offset = 0
         for img in images:
             new_image.paste(img, (x_offset, 0))
             x_offset += img.width
+            x_offset += deltaLen
     elif direction == 'y':
-        total_height = sum(heights)
+        total_height = sum(heights)+ (len(images)-1)*deltaLen
         max_width = max(widths)
         new_image = Image.new('RGB', (max_width, total_height))
         y_offset = 0
         for img in images:
             new_image.paste(img, (0, y_offset))
             y_offset += img.height
+            y_offset += deltaLen
 
     return new_image
 
