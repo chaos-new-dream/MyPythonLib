@@ -53,7 +53,7 @@ def my_Videos2Images(video_path, save_path):
     print(f'一共{totalFrame}帧，保存至{save_path}')  # 表示一个视频片段已经转换完成
     return fps
 
-def my_SimpleStitch(images, direction, deltaLen=0):
+def my_SimpleStitch(images, direction, deltaLen=0,bgColor=0):
     """
     输入图片数组
     输入'x'或者'y'
@@ -64,7 +64,7 @@ def my_SimpleStitch(images, direction, deltaLen=0):
     if direction == 'x':
         total_width = sum(widths) + (len(images)-1)*deltaLen
         max_height = max(heights)
-        new_image = Image.new('RGB', (total_width, max_height))
+        new_image = Image.new('RGB', (total_width, max_height),color=bgColor)
         x_offset = 0
         for img in images:
             new_image.paste(img, (x_offset, 0))
@@ -73,7 +73,7 @@ def my_SimpleStitch(images, direction, deltaLen=0):
     elif direction == 'y':
         total_height = sum(heights)+ (len(images)-1)*deltaLen
         max_width = max(widths)
-        new_image = Image.new('RGB', (max_width, total_height))
+        new_image = Image.new('RGB', (max_width, total_height),color=bgColor)
         y_offset = 0
         for img in images:
             new_image.paste(img, (0, y_offset))
@@ -133,3 +133,8 @@ def myExample_AddText(image,text,pos,colorRGB,ttfPath,fontSize=50):
 def myExample_AddRect(image,xyxy):
     draw = ImageDraw.Draw(image)
     draw.rectangle(xyxy, fill=(127,127,127),outline=(0,0,0),width=10)
+
+
+def myExample_ReplaceExtension(filename):  
+    base = filename.rsplit('.', 1)[0]  # 获取不带后缀的文件名  
+    return base + '.png'  # 添加新的后缀
