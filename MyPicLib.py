@@ -3,6 +3,7 @@ import cv2
 import os
 import sys
 from PIL import Image,ImageDraw,ImageFont
+import shutil
 
 def my_Videos2Images(video_path, save_path):
     """
@@ -52,6 +53,17 @@ def my_Videos2Images(video_path, save_path):
     print('\n')
     print(f'一共{totalFrame}帧，保存至{save_path}')  # 表示一个视频片段已经转换完成
     return fps
+def my_2DStitch(images,x,y,deltaLen=0,bgColor=0):
+    nowIndex = 0
+    colPics=[]
+    for row in range(y):
+        rowPics=[]
+        for col in range(x):
+            pic = images[nowIndex]
+            rowPics.append(pic)
+            nowIndex=nowIndex+1
+        colPics.append(my_SimpleStitch(rowPics,'x',deltaLen,bgColor))
+    return my_SimpleStitch(colPics,'y',deltaLen,bgColor)
 
 def my_SimpleStitch(images, direction, deltaLen=0,bgColor=0):
     """
@@ -135,6 +147,67 @@ def myExample_AddRect(image,xyxy):
     draw.rectangle(xyxy, fill=(127,127,127),outline=(0,0,0),width=10)
 
 
-def myExample_ReplaceExtension(filename):  
-    base = filename.rsplit('.', 1)[0]  # 获取不带后缀的文件名  
-    return base + '.png'  # 添加新的后缀
+
+def my_move_files(source_dir,hz, destination_dir):  
+    # 确保目标目录存在  
+    if not os.path.exists(destination_dir):  
+        print("创建："+destination_dir)
+        os.makedirs(destination_dir)  
+  
+    # 遍历源目录下的所有文件  
+    for dirpath, dirnames, filenames in os.walk(source_dir):
+        for filename in filenames:
+            # base = os.path.splitext(filename)[0]  # 这会返回文件名（不带扩展名）  
+            extension = os.path.splitext(filename)[1]  # 这会返回扩展名（带点.） 
+            if(extension == hz):
+                srcFile = os.path.join(dirpath, filename)  # 构造完整路径
+                exPath = os.path.relpath(srcFile,source_dir)
+                dstFile = os.path.join(destination_dir, exPath)  # 构造完整路径
+
+                dstDir = os.path.dirname(dstFile)
+                if not os.path.exists(dstDir):
+                    os.makedirs(dstDir)  
+                shutil.move(srcFile, dstFile)
+                print(srcFile+"->"+dstFile)
+            # 构造完整的文件路径
+            # source_file_path = os.path.join(source_dir, filename)
+            # source_file_path = os.path.abspath(source_file_path)
+            # destination_file_path = os.path.join(destination_dir, filename)  
+            # destination_file_path = os.path.abspath(destination_file_path)
+            
+            # # 检查是否为文件（而不是文件夹）  
+            # if os.path.isfile(source_file_path):  
+            #     # 移动文件  
+            #     # shutil.move(source_file_path, destination_file_path) 
+            #     print(source_file_path+"\n\t"+destination_file_path) 
+
+def my_rename_files(source_dir,function):  
+    # 遍历源目录下的所有文件  
+    for dirpath, dirnames, filenames in os.walk(source_dir):
+        for filename in filenames:
+            srcFile = os.path.join(dirpath, filename)  # 构造完整路径
+            dstFile = function(filename)
+            # shutil.move(srcFile, dstFile)
+            print(srcFile+"->"+dstFile)
+
+def my_remove_empty_folders(path, remove_root=False):  
+    # 递归函数，从底层开始删除空文件夹  
+    if not os.path.isdir(path):  
+        return  
+  
+    # 遍历文件夹内容  
+    files = os.listdir(path)  
+    if len(files):  
+        for f in files:  
+            full_path = os.path.join(path, f)  
+            if os.path.isdir(full_path):  
+                my_remove_empty_folders(full_path)  
+  
+    # 再次检查文件夹是否为空，如果是则删除  
+    files = os.listdir(path)  
+    if len(files) == 0 and not remove_root:  
+        print(f"Removing empty directory: {path}")  
+        os.rmdir(path)  
+    elif len(files) == 0 and remove_root:  
+        print(f"Removing empty root directory: {path}")  
+        os.rmdir(path)  
